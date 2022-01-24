@@ -1,0 +1,11 @@
+{application, eaex10,
+ [{description, "Implementing AEX-10 - Aeternity key derivation"},
+  {vsn, "1.0.0"},
+  {registered, []},
+  {applications,
+   [kernel, stdlib]},
+  {env,[]},
+  {modules, [eaex10]},
+  {licenses, ["ISC"]},
+  {links, []}
+ ]}.
