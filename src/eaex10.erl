@@ -91,23 +91,25 @@ derive_path(Path, DKey0) ->
 -define(BITCOIN_MAIN_PRIV, <<16#0488ADE4:32>>).
 -define(BITCOIN_MAIN_PUB,  <<16#0488B21E:32>>).
 
-enc_bip32_key(DerivedKey) ->
-  enc_bip32_key(key_type(DerivedKey), DerivedKey).
+-spec enc_bip32_key(DKey :: derived_key()) -> binary().
+enc_bip32_key(DKey) ->
+  enc_bip32_key(key_type(DKey), DKey).
 
-enc_bip32_key(KeyType, DerivedKey) ->
+-spec enc_bip32_key(KeyType :: private | public, DKey :: derived_key()) -> binary().
+enc_bip32_key(KeyType, DKey) ->
   #{chain_code := <<ChainCode:32/bytes>>, depth := Depth,
-    fprint := <<FPrint:4/bytes>>, child := Child, curve := Curve} = DerivedKey,
+    fprint := <<FPrint:4/bytes>>, child := Child, curve := Curve} = DKey,
 
   VsnBytes = version_bytes(Curve, KeyType),
-  Key = case {KeyType, DerivedKey} of
+  Key = case {KeyType, DKey} of
           {public, #{pub_key := <<PubKey:33/bytes>>}}    -> PubKey;
-          {public, #{pub_key := PubKey}}                 -> esecp256k1:compress(PubKey);
           {private, #{priv_key := <<PrivKey:32/bytes>>}} -> <<0:8, PrivKey/bytes>>
         end,
 
   <<VsnBytes:4/bytes, Depth:8, FPrint:4/bytes,
     Child:32, ChainCode:32/bytes, Key:33/bytes>>.
 
+-spec dec_bip32_key(Bip32Key :: binary()) -> derived_key().
 dec_bip32_key(<<VsnBytes:4/bytes, Depth:8, FPrint:4/bytes,
                 Child:32, ChainCode:32/bytes, Key:33/bytes>>) ->
   {Curve, KeyType} =
