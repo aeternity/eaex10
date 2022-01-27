@@ -62,7 +62,7 @@ aeax10_slip10_derivation_ok_test() ->
 aeax10_derivation_ok_test() ->
   Test = fun({Seed, {AcIx, AdIx}, FP, CC, Priv, Pub}) ->
              ?debugFmt("Test derive: account ~p address: ~p", [AcIx, AdIx]),
-             DKey = eaex10:derive_aex10(hex_to_bin(Seed), AcIx, AdIx),
+             DKey = eaex10:derive_aex10_from_seed(hex_to_bin(Seed), AcIx, AdIx),
              DKeyPub = eaex10:private_to_public(DKey),
              PrivBin = hex_to_bin(Priv),
              ?assertEqual(hex_to_bin(CC), maps:get(chain_code, DKey)),

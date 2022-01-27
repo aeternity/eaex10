@@ -1,7 +1,8 @@
 -module(eaex10).
 
 -export([master_key/2,
-         derive_aex10/3, derive_aex10/4,
+         derive_aex10_from_seed/3, derive_aex10_from_seed/4,
+         derive_aex10_from_masterkey/3, derive_aex10_from_masterkey/4,
          derive_path_from_seed/3,
          derive_path/2,
          enc_bip32_key/1, enc_bip32_key/2,
@@ -48,20 +49,35 @@ master_key(Curve, Seed) when byte_size(Seed) >= 16, byte_size(Seed) =< 64 ->
                priv_key => <<ILeft:256>>, pub_key => undefined, chain_code => IRight}
   end.
 
--spec derive_aex10(Seed         :: binary(),
-                   AccountIndex :: non_neg_integer(),
-                   AddressIndex :: non_neg_integer()) -> derived_key().
-derive_aex10(Seed, AccountIndex, AddressIndex) ->
-  derive_aex10(Seed, AccountIndex, 0, AddressIndex).
+-spec derive_aex10_from_seed(Seed         :: binary(),
+                             AccountIndex :: non_neg_integer(),
+                             AddressIndex :: non_neg_integer()) -> derived_key().
+derive_aex10_from_seed(Seed, AccountIndex, AddressIndex) ->
+  derive_aex10_from_seed(Seed, AccountIndex, 0, AddressIndex).
 
--spec derive_aex10(Seed         :: binary(),
-                   AccountIndex :: non_neg_integer(),
-                   Change       :: non_neg_integer(),
-                   AddressIndex :: non_neg_integer()) -> derived_key().
-derive_aex10(Seed, AccountIndex, Change, AddressIndex) ->
+-spec derive_aex10_from_seed(Seed         :: binary(),
+                             AccountIndex :: non_neg_integer(),
+                             Change       :: non_neg_integer(),
+                             AddressIndex :: non_neg_integer()) -> derived_key().
+derive_aex10_from_seed(Seed, AccountIndex, Change, AddressIndex) ->
   Path = "m/44H/457H/" ++ integer_to_list(AccountIndex) ++ "H/" ++
     integer_to_list(Change) ++ "H/" ++ integer_to_list(AddressIndex) ++ "H",
   derive_path_from_seed(ed25519, Path, Seed).
+
+-spec derive_aex10_from_masterkey(MasterKey    :: derived_key(),
+                                  AccountIndex :: non_neg_integer(),
+                                  AddressIndex :: non_neg_integer()) -> derived_key().
+derive_aex10_from_masterkey(MasterKey, AccountIndex, AddressIndex) ->
+  derive_aex10_from_masterkey(MasterKey, AccountIndex, 0, AddressIndex).
+
+-spec derive_aex10_from_masterkey(MasterKey    :: binary(),
+                                  AccountIndex :: non_neg_integer(),
+                                  Change       :: non_neg_integer(),
+                                  AddressIndex :: non_neg_integer()) -> derived_key().
+derive_aex10_from_masterkey(MasterKey, AccountIndex, Change, AddressIndex) ->
+  Path = "m/44H/457H/" ++ integer_to_list(AccountIndex) ++ "H/" ++
+    integer_to_list(Change) ++ "H/" ++ integer_to_list(AddressIndex) ++ "H",
+  derive_path(Path, MasterKey).
 
 -spec derive_path_from_seed(Curve :: curve(),
                             Path  :: string(),
