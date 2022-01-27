@@ -5,6 +5,7 @@
          derive_aex10_from_masterkey/3, derive_aex10_from_masterkey/4,
          derive_path_from_seed/3,
          derive_path/2,
+         private_key/1, public_key/1,
          enc_bip32_key/1, enc_bip32_key/2,
          dec_bip32_key/1,
          encode_base58c/1, decode_base58c/1,
@@ -23,14 +24,28 @@
 
 -type curve() :: ed25519 | secp256k1.
 
+-type binary_32() :: <<_:256>>.
+
 -type derived_key() ::
   #{ curve      := curve(),
      depth      := non_neg_integer(),
      child      := non_neg_integer(),
      fprint     := <<_:32>>,
-     priv_key   := <<_:256>>,
-     pub_key    := undefined | <<_:256>> | <<_:264>>,
-     chain_code := <<_:256>> }.
+     priv_key   := binary_32(),
+     pub_key    := undefined | binary_32() | <<_:264>>,
+     chain_code := binary_32() }.
+
+-spec private_key(DKey :: derived_key()) -> {ok, binary_32()} | no_private_key.
+private_key(#{priv_key := undefined}) ->
+  no_private_key;
+private_key(#{priv_key := PrivKey}) ->
+  {ok, PrivKey}.
+
+-spec public_key(DKey :: derived_key()) -> {ok, binary_32()}.
+public_key(DKey = #{pub_key := undefined}) ->
+  public_key(private_to_public(DKey));
+public_key(#{priv_key := PrivKey}) ->
+  {ok, PrivKey}.
 
 -spec private_to_public(DKey :: derived_key()) -> derived_key().
 private_to_public(DKey = #{curve := Curve, pub_key := undefined,
