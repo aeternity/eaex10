@@ -44,8 +44,8 @@ private_key(#{priv_key := PrivKey}) ->
 -spec public_key(DKey :: derived_key()) -> {ok, binary_32()}.
 public_key(DKey = #{pub_key := undefined}) ->
   public_key(private_to_public(DKey));
-public_key(#{priv_key := PrivKey}) ->
-  {ok, PrivKey}.
+public_key(#{pub_key := PubKey}) ->
+  {ok, PubKey}.
 
 -spec private_to_public(DKey :: derived_key()) -> derived_key().
 private_to_public(DKey = #{curve := Curve, pub_key := undefined,
