@@ -85,7 +85,7 @@ derive_aex10_from_seed(Seed, AccountIndex, Change, AddressIndex) ->
 derive_aex10_from_masterkey(MasterKey, AccountIndex, AddressIndex) ->
   derive_aex10_from_masterkey(MasterKey, AccountIndex, 0, AddressIndex).
 
--spec derive_aex10_from_masterkey(MasterKey    :: binary(),
+-spec derive_aex10_from_masterkey(MasterKey    :: derived_key(),
                                   AccountIndex :: non_neg_integer(),
                                   Change       :: non_neg_integer(),
                                   AddressIndex :: non_neg_integer()) -> derived_key().
